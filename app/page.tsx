@@ -1,101 +1,164 @@
-import Image from "next/image";
+import { DashedBox } from "@/components/dashed-box";
+import { CTAButton } from "@/components/cta-button";
 
 export default function Home() {
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    <div className="min-h-screen bg-white flex justify-center">
+      {/* Centered container for both columns */}
+      <div className="flex gap-8 w-full max-w-[1150px]">
+        {/* Left Column: fully scrollable copy */}
+        <div
+          className="w-[566px] overflow-y-auto h-screen hide-scrollbar"
+          style={{
+            WebkitMaskImage:
+              "linear-gradient(to bottom, transparent, black 100px)",
+            maskImage: "linear-gradient(to bottom, transparent, black 100px)",
+          }}
+        >
+          <div className="p-8 lg:p-16">
+            <h1 className="text-4xl font-bold mb-8">Founders Inc.</h1>
+            <CTAButton href="/apply" className="mb-12">
+              join us - apply here
+            </CTAButton>
+            <h2 className="text-2xl font-semibold mb-6">[ship it]</h2>
+            <p className="mb-6">
+              We&apos;re running a 4 week sprint from Feb 24th to March 21st out
+              of Fort Mason, SF.
+            </p>
+            <p className="mb-8">
+              50 teams will be selected to make 10 years of progress in 30 days.
+            </p>
+            <p className="mb-6">tldr;</p>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+            <ul className="space-y-6 mb-8">
+              <li className="flex gap-4">
+                <span className="font-medium">1.</span>
+                <p>
+                  full access to our SF lab, where you can work alongside 100s
+                  of builders 1-3 steps ahead of you.
+                </p>
+              </li>
+              <li className="flex gap-4">
+                <span className="font-medium">2.</span>
+                <p>
+                  office hours with our team + founders to help you figure out
+                  growth, marketing, product &amp; what to focus on.
+                </p>
+              </li>
+              <li className="flex gap-4">
+                <span className="font-medium">3.</span>
+                <p>
+                  A final demo day where you could get funded to go all in on
+                  your startup. We&apos;ll be investing $1,000,000 this round.
+                </p>
+              </li>
+            </ul>
+
+            <div className="space-y-6 mb-12">
+              <p>
+                Every week you&apos;ll set a goal &amp; we&apos;ll give you
+                everything we have to make it happen.
+              </p>
+              <p>
+                At the end of each week, you&apos;ll present your progress in
+                front of the whole batch.
+              </p>
+              <p>
+                If you kill it, you&apos;ll get your first check and a permanent
+                home for life at our SF lab.
+              </p>
+              <p>
+                We&apos;re looking for the most ambitious founders around the
+                world.
+              </p>
+              <p>
+                If that sounds like you - tell us who you are &amp; what
+                you&apos;re building.
+              </p>
+            </div>
+
+            <section className="space-y-6 mb-12">
+              <h2 className="text-2xl font-semibold">But...</h2>
+              <p>You&apos;re probably wondering what this is.</p>
+              <p>We&apos;re Founders, Inc.</p>
+              <p>
+                Over the last 3 years we&apos;ve built what we call a &apos;home
+                for founders&apos;.
+              </p>
+              <p>Yes, we&apos;re a VC.</p>
+              <p>
+                We invest in early stage founders &amp; hopefully that means
+                you.
+              </p>
+              <p>But we do a whole lot more than just write a check.</p>
+              <p>
+                Working w/ us means you have a permanent home for life at our SF
+                lab.
+              </p>
+              <p>
+                Whether you pivot, shut down, or go to the moon, we&apos;ll be
+                here to support you.
+              </p>
+              <p>
+                Because we&apos;re founders too, &amp; we deeply understand what
+                it really takes to make it.
+              </p>
+              <p>It&apos;s not MRR, PMF, etc.</p>
+              <p>
+                It&apos;s being more ambitious &amp; resilient than anyone on
+                earth.
+              </p>
+              <p>
+                &amp; that&apos;s our goal. To give you the perfect environment
+                to become that.
+              </p>
+              <p>
+                Our sole belief is that when we bring together ambitious people
+                to work shoulder to shoulder, eat together &amp; share ideas,
+                great things happen.
+              </p>
+              <p>
+                So that&apos;s what this is: a genuine community of founders
+                &amp; all the resources that brings.
+              </p>
+            </section>
+
+            <CTAButton href="/apply" variant="solid">
+              we built this for you - join us
+            </CTAButton>
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+
+        {/* Right Column: sticky video with dashed overlay */}
+        <div className="w-[561px] sticky top-0 self-start pt-8 lg:pt-16">
+          <div
+            className="relative w-[561px] bg-black overflow-hidden"
+            style={{ height: "calc(100vh - 2rem)" }}
+          >
+            <video
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="absolute inset-0 w-full h-full object-cover"
+            >
+              <source src="/website-video.mp4" type="video/mp4" />
+            </video>
+            <div className="absolute inset-0 bg-[rgba(0,0,0,0.50)]" />
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-6">
+              <DashedBox className="w-[288px] h-[77px] text-white text-center text-[25px] font-semibold flex items-center justify-center">
+                4 weeks
+              </DashedBox>
+              <DashedBox className="w-[288px] h-[77px] text-white text-center text-[25px] font-semibold flex items-center justify-center">
+                Feb 24th
+              </DashedBox>
+              <DashedBox className="w-[288px] h-[77px] text-white text-center text-[25px] font-semibold flex items-center justify-center">
+                San Francisco
+              </DashedBox>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
