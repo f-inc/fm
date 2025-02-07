@@ -8,7 +8,7 @@ export default function Home() {
       <div className="flex gap-8 w-full max-w-[1150px]">
         {/* Left Column: fully scrollable copy */}
         <div
-          className="w-[566px] overflow-y-auto h-screen hide-scrollbar"
+          className="w-[561px] overflow-y-auto h-screen hide-scrollbar"
           style={{
             WebkitMaskImage:
               "linear-gradient(to bottom, transparent, black 100px)",
@@ -128,7 +128,6 @@ export default function Home() {
             </CTAButton>
           </div>
         </div>
-
         {/* Right Column: sticky video with dashed overlay */}
         <div className="w-[561px] sticky top-0 self-start pt-8 lg:pt-16">
           <div
