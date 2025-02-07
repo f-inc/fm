@@ -27,26 +27,33 @@ export default function Home() {
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
-    audioRef.current = new Audio("/seeyourselfinmyeyes.mp3");
-
     const audio = audioRef.current;
+    if (!audio) return;
 
-    audio.addEventListener("loadedmetadata", () => {
+    // Force the browser to load the audio metadata
+    audio.load();
+
+    const handleLoadedMetadata = () => {
+      console.log("Loaded metadata:", audio.duration);
       setDuration(audio.duration);
-    });
+    };
 
+    audio.addEventListener("loadedmetadata", handleLoadedMetadata);
+
+    // Update current time while the audio is playing
     audio.addEventListener("timeupdate", () => {
       setCurrentTime(audio.currentTime);
     });
 
+    // Reset state when audio ends
     audio.addEventListener("ended", () => {
       setIsPlaying(false);
       setCurrentTime(0);
     });
 
     return () => {
+      audio.removeEventListener("loadedmetadata", handleLoadedMetadata);
       audio.pause();
-      audio.src = "";
     };
   }, []);
 
@@ -150,7 +157,11 @@ export default function Home() {
     if (isPlaying) {
       audioRef.current.pause();
     } else {
-      audioRef.current.play();
+      // Safari may reject play() if not triggered by a trusted event,
+      // so catch and log any potential error.
+      audioRef.current
+        .play()
+        .catch((err) => console.error("Audio playback error:", err));
     }
     setIsPlaying(!isPlaying);
   };
@@ -381,6 +392,15 @@ export default function Home() {
           </div>
         </div>
       </div>
+
+      {/* Hidden audio element added to the DOM for improved compatibility in Safari */}
+      <audio
+        ref={audioRef}
+        src="/seeyourselfinmyeyes.mp3"
+        playsInline
+        preload="metadata"
+        className="hidden"
+      />
     </div>
   );
 }
