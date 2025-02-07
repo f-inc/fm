@@ -11,8 +11,8 @@ export default function Home() {
           className="w-[561px] overflow-y-auto h-screen hide-scrollbar"
           style={{
             WebkitMaskImage:
-              "linear-gradient(to bottom, transparent, black 100px)",
-            maskImage: "linear-gradient(to bottom, transparent, black 100px)",
+              "linear-gradient(to bottom, transparent, black 150px)",
+            maskImage: "linear-gradient(to bottom, transparent, black 150px)",
           }}
         >
           <div className="p-8 lg:p-16">
@@ -20,6 +20,21 @@ export default function Home() {
             <CTAButton href="/apply" className="mb-12">
               join us - apply here
             </CTAButton>
+            {/* Add audio player UI */}
+            <div className="flex items-center gap-4 mb-8 text-gray-500">
+              <button className="p-2">
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path d="M8 5V19L19 12L8 5Z" fill="currentColor" />
+                </svg>
+              </button>
+              <div className="text-sm">0:00 / 1:44</div>
+            </div>
             <h2 className="text-2xl font-semibold mb-6">[ship it]</h2>
             <p className="mb-6">
               We&apos;re running a 4 week sprint from Feb 24th to March 21st out
