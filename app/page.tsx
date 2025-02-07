@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 import { DashedBox } from "@/components/dashed-box";
 import { CTAButton } from "@/components/cta-button";
 
@@ -5,7 +7,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-white flex justify-center">
       {/* Centered container for both columns */}
-      <div className="flex gap-8 w-full max-w-[1150px]">
+      <div className="flex flex-col-reverse md:flex-row gap-8 w-full max-w-[1150px]">
         {/* Left Column: fully scrollable copy */}
         <div
           className="w-[561px] overflow-y-auto h-screen hide-scrollbar"
@@ -144,34 +146,47 @@ export default function Home() {
           </div>
         </div>
         {/* Right Column: sticky video with dashed overlay */}
-        <div className="w-[561px] sticky top-0 self-start pt-8 lg:pt-16">
-          <div
-            className="relative w-[561px] bg-black overflow-hidden"
-            style={{ height: "calc(100vh - 2rem)" }}
-          >
-            <video
-              autoPlay
-              loop
-              muted
-              playsInline
-              className="absolute inset-0 w-full h-full object-cover"
-            >
-              <source src="/website-video.mp4" type="video/mp4" />
-            </video>
-            <div className="absolute inset-0 bg-[rgba(0,0,0,0.50)]" />
-            <div className="absolute inset-0 flex flex-col items-center justify-center gap-6">
-              <DashedBox className="w-[288px] h-[77px] text-white text-center text-[25px] font-semibold flex items-center justify-center">
-                4 weeks
-              </DashedBox>
-              <DashedBox className="w-[288px] h-[77px] text-white text-center text-[25px] font-semibold flex items-center justify-center">
-                Feb 24th
-              </DashedBox>
-              <DashedBox className="w-[288px] h-[77px] text-white text-center text-[25px] font-semibold flex items-center justify-center">
-                San Francisco
-              </DashedBox>
-            </div>
-          </div>
-        </div>
+				<div
+					className="relative w-[561px] bg-black overflow-hidden min-w-full max-h-[50vh] md:inline md:max-h-[100%] md:min-w-fit"
+					style={{ height: "calc(100vh - 2rem)" }}
+				>
+					<video
+						autoPlay
+						loop
+						muted
+						playsInline
+						className="absolute inset-0 w-full h-full object-cover"
+					>
+						<source src="/website-video.mp4" type="video/mp4" />
+					</video>
+					<div className="absolute inset-0 bg-[rgba(0,0,0,0.50)]" />
+					<div className="absolute inset-0 flex flex-col items-center justify-center gap-6">
+						<div className="relative w-[288px] h-[77px]">
+							<Image
+								alt="4 weeks"
+								fill
+								src="/4weeks.svg"
+								style={{ objectFit: "cover" }}
+							/>
+						</div>
+						<div className="relative w-[288px] h-[77px]">
+							<Image
+								alt="Feb 24th"
+								fill
+								src="/feb24.svg"
+								style={{ objectFit: "cover" }}
+							/>
+						</div>
+						<div className="relative w-[288px] h-[77px]">
+							<Image
+								alt="SF"
+								fill
+								src="/SF.svg"
+								style={{ objectFit: "cover" }}
+							/>
+						</div>
+					</div>
+				</div>
       </div>
     </div>
   );
