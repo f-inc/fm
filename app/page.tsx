@@ -109,9 +109,31 @@ export default function Home() {
   useEffect(() => {
     if (videoRef.current) {
       if (Hls.isSupported()) {
-        const hls = new Hls();
+        const hls = new Hls({
+          autoStartLoad: true,
+          startLevel: 0, // Start with lowest quality
+          initialLiveManifestSize: 1, // Load first segment faster
+          maxLoadingDelay: 1, // Reduce delay before loading segments
+          maxBufferLength: 30, // Reduce memory usage
+          maxMaxBufferLength: 600,
+          backBufferLength: 90,
+          enableWorker: true, // Use Web Workers for better performance
+          lowLatencyMode: true,
+          progressive: true, // Enable progressive download
+          // Aggressive bandwidth estimation
+          abrEwmaDefaultEstimate: 500000, // 500kbps default
+          abrEwmaFastLive: 3,
+          abrEwmaSlowLive: 9,
+        });
+
         hls.loadSource("/index.m3u8");
         hls.attachMedia(videoRef.current);
+
+        // Switch to higher quality once playing
+        hls.on(Hls.Events.MANIFEST_PARSED, () => {
+          hls.startLoad(-1);
+        });
+
         return () => {
           hls.destroy();
         };
@@ -326,6 +348,7 @@ export default function Home() {
             autoPlay
             loop
             muted
+            poster="/video-poster.jpg"
             playsInline
             className="absolute inset-0 w-full h-full object-cover"
           />
