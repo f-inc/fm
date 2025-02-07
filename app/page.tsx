@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useRef, useState, useEffect } from "react";
+import Hls from "hls.js";
 
 import { CTAButton } from "@/components/cta-button";
 
@@ -16,12 +17,14 @@ export default function Home() {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const [maskOffset, setMaskOffset] = useState("135px");
+  const [maskOffset, setMaskOffset] = useState("0px");
 
   // Ref for the scrollable text container
   const textContainerRef = useRef<HTMLDivElement>(null);
-  // State to decide when to remove the gradient overlay
+  // State to remove mask when scrolled near bottom
   const [atBottom, setAtBottom] = useState(false);
+
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
     audioRef.current = new Audio("/seeyourselfinmyeyes.mp3");
@@ -54,30 +57,74 @@ export default function Home() {
 
     // Set initial value
     handleResize();
+
+    // Add event listener
     window.addEventListener("resize", handleResize);
+
+    // Cleanup
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Detect scroll position and update state to hide the overlay when nearing the bottom.
+  // Listen to scroll events on the text container and update atBottom with a debounce
   useEffect(() => {
     const container = textContainerRef.current;
     if (!container) return;
 
-    const handleScroll = () => {
+    let debounceTimer: number | undefined;
+
+    const recalcAtBottom = () => {
       const maskOffsetValue = parseInt(maskOffset, 10);
       const bottomOffset =
         container.scrollHeight - container.scrollTop - container.clientHeight;
       setAtBottom(bottomOffset < maskOffsetValue);
     };
 
+    const handleScroll = () => {
+      // Recalculate immediately
+      recalcAtBottom();
+
+      // Clear any existing timer
+      if (debounceTimer) {
+        clearTimeout(debounceTimer);
+      }
+
+      // Set a new timer to recalc after scrolling stops
+      debounceTimer = window.setTimeout(() => {
+        recalcAtBottom();
+      }, 100);
+    };
+
     container.addEventListener("scroll", handleScroll);
-    // In case the container is already scrolled near the bottom.
-    handleScroll();
-    return () => container.removeEventListener("scroll", handleScroll);
+    // Initial check in case the container is already near the bottom
+    recalcAtBottom();
+
+    return () => {
+      container.removeEventListener("scroll", handleScroll);
+      if (debounceTimer) {
+        clearTimeout(debounceTimer);
+      }
+    };
   }, [maskOffset]);
+
+  useEffect(() => {
+    if (videoRef.current) {
+      if (Hls.isSupported()) {
+        const hls = new Hls();
+        hls.loadSource("/index.m3u8");
+        hls.attachMedia(videoRef.current);
+        return () => {
+          hls.destroy();
+        };
+      } else {
+        // Fallback for browsers with native HLS support (e.g. Safari)
+        videoRef.current.src = "/index.m3u8";
+      }
+    }
+  }, []);
 
   const togglePlay = () => {
     if (!audioRef.current) return;
+
     if (isPlaying) {
       audioRef.current.pause();
     } else {
@@ -92,10 +139,18 @@ export default function Home() {
     <div className="min-h-screen bg-white flex justify-center">
       {/* Centered container for both columns */}
       <div className="flex flex-col-reverse md:flex-row gap-8 w-full max-w-[1150px]">
-        {/* Left Column: fully scrollable copy with gradient overlay */}
+        {/* Left Column: fully scrollable copy */}
         <div
           ref={textContainerRef}
-          className="relative w-full md:w-[561px] overflow-y-auto h-screen hide-scrollbar"
+          className="w-full md:w-[561px] overflow-y-auto h-screen hide-scrollbar"
+          style={
+            !atBottom
+              ? {
+                  WebkitMaskImage: `linear-gradient(to bottom, transparent, black ${maskOffset})`,
+                  maskImage: `linear-gradient(to bottom, transparent, black ${maskOffset})`,
+                }
+              : {}
+          }
         >
           <div className="p-8 lg:p-16">
             {/* The title is hidden on small screens and only shown on md and up */}
@@ -260,17 +315,6 @@ export default function Home() {
               we built this for you - join us
             </CTAButton>
           </div>
-          {/* Gradient overlay to simulate a fading mask.
-              It's only visible when not scrolled to the bottom. */}
-          {!atBottom && (
-            <div
-              className="absolute bottom-0 left-0 w-full pointer-events-none"
-              style={{
-                height: maskOffset,
-                background: "linear-gradient(to top, white, transparent)",
-              }}
-            />
-          )}
         </div>
         {/* Right Column: sticky video with dashed overlay */}
         <div
@@ -278,14 +322,13 @@ export default function Home() {
           style={{ height: "calc(100vh - 2rem)" }}
         >
           <video
+            ref={videoRef}
             autoPlay
             loop
             muted
             playsInline
             className="absolute inset-0 w-full h-full object-cover"
-          >
-            <source src="/website-video.mp4" type="video/mp4" />
-          </video>
+          />
           <div className="absolute inset-0 bg-[rgba(0,0,0,0.50)]" />
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-6">
             <div className="relative w-[288px] h-[77px]">
