@@ -205,7 +205,7 @@ export default function Home() {
                   3.
                 </span>
                 <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
-                  A final demo day where you could get funded to go all in on
+                  a final demo day where you could get funded to go all in on
                   your startup. We&apos;re looking to invest $1,000,000 this
                   round.
                 </p>
