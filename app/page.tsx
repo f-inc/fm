@@ -124,7 +124,7 @@ export default function Home() {
         >
           <div className="p-8 lg:p-16">
             {/* The title is hidden on small screens and only shown on md and up */}
-            <h1 className="hidden md:block text-4xl font-black text-zinc-800 mb-8 text-6xl tracking-[-0.055em]">
+            <h1 className="hidden md:block font-black text-zinc-800 mb-8 text-6xl tracking-[-0.055em]">
               Founders Inc.
             </h1>
             <CTAButton
@@ -169,34 +169,42 @@ export default function Home() {
             <h2 className="text-[32px] font-bold mb-6 text-zinc-800 tracking-[-0.055em]">
               [ship it]
             </h2>
-            <p className="mb-6 tracking-[-0.055em] text-[22.5px]">
+            <p className="mb-6 tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
               We&apos;re running a 4 week sprint from Feb 24th to March 21st out
               of Fort Mason, SF.
             </p>
-            <p className="mb-8 tracking-[-0.055em] text-[22.5px]">
+            <p className="mb-8 tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
               50 teams will be invited to gain life changing momentum in 30
               days.
             </p>
-            <p className="mb-6 tracking-[-0.055em] text-[22.5px]">tldr;</p>
+            <p className="mb-6 tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
+              tldr;
+            </p>
 
             <ul className="space-y-6 mb-8">
               <li className="flex gap-4">
-                <span className="font-large text-[22.5px]">1.</span>
-                <p className="tracking-[-0.055em] text-[22.5px]">
+                <span className="font-large text-[22.5px] text-[#3a3a3a]">
+                  1.
+                </span>
+                <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
                   full access to our SF lab, where you can work alongside 100+
                   of builders 1-3 steps ahead of you.
                 </p>
               </li>
               <li className="flex gap-4">
-                <span className="font-large text-[22.5px]">2.</span>
-                <p className="tracking-[-0.055em] text-[22.5px]">
+                <span className="font-large text-[22.5px] text-[#3a3a3a]">
+                  2.
+                </span>
+                <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
                   office hours with our team + founders to help you figure out
                   growth, marketing, product &amp; what to focus on.
                 </p>
               </li>
               <li className="flex gap-4">
-                <span className="font-large text-[22.5px]">3.</span>
-                <p className="tracking-[-0.055em] text-[22.5px]">
+                <span className="font-large text-[22.5px] text-[#3a3a3a]">
+                  3.
+                </span>
+                <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
                   A final demo day where you could get funded to go all in on
                   your startup. We&apos;re looking to invest $1,000,000 this
                   round.
@@ -205,23 +213,23 @@ export default function Home() {
             </ul>
 
             <div className="space-y-6 mb-12">
-              <p className="tracking-[-0.055em] text-[22.5px]">
+              <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
                 Every week you&apos;ll set a goal &amp; we&apos;ll give you
                 everything we have to make it happen.
               </p>
-              <p className="tracking-[-0.055em] text-[22.5px]">
+              <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
                 At the end of each week, you&apos;ll present your progress in
                 front of the whole batch.
               </p>
-              <p className="tracking-[-0.055em] text-[22.5px]">
+              <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
                 If you kill it, you&apos;ll get your first check and a permanent
                 home for life at our SF lab.
               </p>
-              <p className="tracking-[-0.055em] text-[22.5px]">
+              <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
                 We&apos;re looking for the most ambitious founders around the
                 world.
               </p>
-              <p className="tracking-[-0.055em] text-[22.5px]">
+              <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
                 If that sounds like you - tell us who you are &amp; what
                 you&apos;re building.
               </p>
@@ -229,60 +237,60 @@ export default function Home() {
 
             <section className="space-y-6 mb-12">
               <h2 className="text-2xl font-semibold">But...</h2>
-              <p className="tracking-[-0.055em] text-[22.5px]">
+              <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
                 You&apos;re probably wondering who we are.
               </p>
-              <p className="tracking-[-0.055em] text-[22.5px]">
+              <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
                 We&apos;re Founders, Inc.
               </p>
-              <p className="tracking-[-0.055em] text-[22.5px]">
+              <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
                 Over the last 3 years we&apos;ve built what we call a &apos;home
                 for founders&apos;.
               </p>
-              <p className="tracking-[-0.055em] text-[22.5px]">
+              <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
                 Yes, we&apos;re a VC.
               </p>
-              <p className="tracking-[-0.055em] text-[22.5px]">
+              <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
                 We invest in early stage founders &amp; hopefully that means
                 you.
               </p>
-              <p className="tracking-[-0.055em] text-[22.5px]">
+              <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
                 But we do not exist to just write checks. It&apos;s not what
                 drives us to do what we do.
               </p>
-              <p className="tracking-[-0.055em] text-[22.5px]">
+              <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
                 We exist to find you, someone who&apos;s been overlooked,
                 working on something they know will leave a mark.
               </p>
-              <p className="tracking-[-0.055em] text-[22.5px]">
+              <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
                 Working w/ us means you have a permanent home for life at our SF
                 lab.
               </p>
-              <p className="tracking-[-0.055em] text-[22.5px]">
+              <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
                 Whether you pivot, shut down, or buy 6 Miatas, we&apos;ll be
                 here to support you.
               </p>
-              <p className="tracking-[-0.055em] text-[22.5px]">
+              <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
                 Because we&apos;re founders too, &amp; we deeply understand what
                 it really takes to make it.
               </p>
-              <p className="tracking-[-0.055em] text-[22.5px]">
+              <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
                 It&apos;s not just MRR, PMF, etc.
               </p>
-              <p className="tracking-[-0.055em] text-[22.5px]">
+              <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
                 It&apos;s being more ambitious &amp; resilient than anyone on
                 earth.
               </p>
-              <p className="tracking-[-0.055em] text-[22.5px]">
+              <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
                 &amp; that&apos;s our goal. To give you the perfect environment
                 to become that person.
               </p>
-              <p className="tracking-[-0.055em] text-[22.5px]">
+              <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
                 Our sole belief is that when we bring together ambitious people
                 to work shoulder to shoulder, eat together &amp; share ideas,
                 great things happen.
               </p>
-              <p className="tracking-[-0.055em] text-[22.5px]">
+              <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
                 So that&apos;s what this is: a genuine community of founders
                 &amp; all the resources that brings.
               </p>
