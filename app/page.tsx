@@ -59,38 +59,46 @@ export default function Home() {
       if (Hls.isSupported()) {
         const hls = new Hls({
           autoStartLoad: true,
-          startLevel: -1, // Let HLS choose the appropriate quality
-          initialLiveManifestSize: 3, // Load first 3 segments
-          maxLoadingDelay: 1,
-          maxBufferLength: 300, // Increase buffer length to store more segments
-          maxMaxBufferLength: 600,
-          backBufferLength: 300, // Increase back buffer to keep more previous segments
+          startLevel: 0, // Start with lowest quality
+          maxBufferLength: 30, // Reduce buffer length for mobile
+          maxMaxBufferLength: 60,
+          backBufferLength: 30,
           enableWorker: true,
-          lowLatencyMode: false, // Disable low latency mode for better buffering
-          progressive: false, // Disable progressive download for complete segment loading
-          // More aggressive bandwidth estimation
-          abrEwmaDefaultEstimate: 1000000, // 1Mbps default
-          abrEwmaFastLive: 2,
-          abrEwmaSlowLive: 5,
+          lowLatencyMode: true, // Enable low latency for mobile
+          progressive: true, // Enable progressive download
+          // More conservative bandwidth estimation for mobile
+          abrEwmaDefaultEstimate: 500000, // 500kbps default
+          abrEwmaFastLive: 3,
+          abrEwmaSlowLive: 9,
         });
 
         hls.loadSource("/index.m3u8");
         hls.attachMedia(videoRef.current);
 
-        // Optional: Log segment loading for debugging
-        hls.on(Hls.Events.FRAG_LOADED, (event, data) => {
-          console.log("Loaded segment:", data.frag.sn);
-        });
-
-        hls.on(Hls.Events.MANIFEST_PARSED, () => {
-          hls.startLoad(); // Remove the -1 parameter
+        hls.on(Hls.Events.ERROR, (event, data) => {
+          console.error("HLS error:", data);
+          if (data.fatal) {
+            switch (data.type) {
+              case Hls.ErrorTypes.NETWORK_ERROR:
+                hls.startLoad(); // Try to recover
+                break;
+              case Hls.ErrorTypes.MEDIA_ERROR:
+                hls.recoverMediaError(); // Try to recover
+                break;
+              default:
+                hls.destroy();
+                break;
+            }
+          }
         });
 
         return () => {
           hls.destroy();
         };
-      } else {
-        // Fallback for browsers with native HLS support (e.g. Safari)
+      } else if (
+        videoRef.current.canPlayType("application/vnd.apple.mpegurl")
+      ) {
+        // Native HLS support (iOS Safari)
         videoRef.current.src = "/index.m3u8";
       }
     }
@@ -263,8 +271,8 @@ export default function Home() {
                 working on something they know will leave a mark.
               </p>
               <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
-                Working w/ us means you have a permanent home for life at our SF
-                lab.
+                Working w/ us means we will have your back for the rest of your
+                life.
               </p>
               <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
                 Whether you pivot, shut down, or buy 6 Miatas, we&apos;ll be
@@ -311,6 +319,9 @@ export default function Home() {
             poster="/video-poster.jpg"
             playsInline
             className="absolute inset-0 w-full h-full object-cover"
+            x-webkit-airplay="allow"
+            x-webkit-playsinline="true"
+            controlsList="nodownload"
           />
           <div className="absolute inset-0 bg-[rgba(0,0,0,0.50)]" />
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-6">
