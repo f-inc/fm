@@ -17,12 +17,9 @@ export default function Home() {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const [maskOffset, setMaskOffset] = useState("0px");
 
   // Ref for the scrollable text container
   const textContainerRef = useRef<HTMLDivElement>(null);
-  // State to remove mask when scrolled near bottom
-  const [atBottom, setAtBottom] = useState(false);
 
   const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -58,87 +55,35 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    const handleResize = () => {
-      setMaskOffset(window.innerWidth < 768 ? "50px" : "125px");
-    };
-
-    // Set initial value
-    handleResize();
-
-    // Add event listener
-    window.addEventListener("resize", handleResize);
-
-    // Cleanup
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-  // Listen to scroll events on the text container and update atBottom with a debounce
-  useEffect(() => {
-    const container = textContainerRef.current;
-    if (!container) return;
-
-    let debounceTimer: number | undefined;
-
-    const recalcAtBottom = () => {
-      const maskOffsetValue = parseInt(maskOffset, 10);
-      const bottomOffset =
-        container.scrollHeight - container.scrollTop - container.clientHeight;
-      setAtBottom(bottomOffset < maskOffsetValue);
-    };
-
-    const handleScroll = () => {
-      // Recalculate immediately
-      recalcAtBottom();
-
-      // Clear any existing timer
-      if (debounceTimer) {
-        clearTimeout(debounceTimer);
-      }
-
-      // Set a new timer to recalc after scrolling stops
-      debounceTimer = window.setTimeout(() => {
-        recalcAtBottom();
-      }, 100);
-    };
-
-    container.addEventListener("scroll", handleScroll);
-    // Initial check in case the container is already near the bottom
-    recalcAtBottom();
-
-    return () => {
-      container.removeEventListener("scroll", handleScroll);
-      if (debounceTimer) {
-        clearTimeout(debounceTimer);
-      }
-    };
-  }, [maskOffset]);
-
-  useEffect(() => {
     if (videoRef.current) {
       if (Hls.isSupported()) {
         const hls = new Hls({
           autoStartLoad: true,
-          startLevel: 0, // Start with lowest quality
-          initialLiveManifestSize: 1, // Load first segment faster
-          maxLoadingDelay: 1, // Reduce delay before loading segments
-          maxBufferLength: 30, // Reduce memory usage
+          startLevel: -1, // Let HLS choose the appropriate quality
+          initialLiveManifestSize: 3, // Load first 3 segments
+          maxLoadingDelay: 1,
+          maxBufferLength: 300, // Increase buffer length to store more segments
           maxMaxBufferLength: 600,
-          backBufferLength: 90,
-          enableWorker: true, // Use Web Workers for better performance
-          lowLatencyMode: true,
-          progressive: true, // Enable progressive download
-          // Aggressive bandwidth estimation
-          abrEwmaDefaultEstimate: 500000, // 500kbps default
-          abrEwmaFastLive: 3,
-          abrEwmaSlowLive: 9,
+          backBufferLength: 300, // Increase back buffer to keep more previous segments
+          enableWorker: true,
+          lowLatencyMode: false, // Disable low latency mode for better buffering
+          progressive: false, // Disable progressive download for complete segment loading
+          // More aggressive bandwidth estimation
+          abrEwmaDefaultEstimate: 1000000, // 1Mbps default
+          abrEwmaFastLive: 2,
+          abrEwmaSlowLive: 5,
         });
 
         hls.loadSource("/index.m3u8");
         hls.attachMedia(videoRef.current);
 
-        // Switch to higher quality once playing
+        // Optional: Log segment loading for debugging
+        hls.on(Hls.Events.FRAG_LOADED, (event, data) => {
+          console.log("Loaded segment:", data.frag.sn);
+        });
+
         hls.on(Hls.Events.MANIFEST_PARSED, () => {
-          hls.startLoad(-1);
+          hls.startLoad(); // Remove the -1 parameter
         });
 
         return () => {
@@ -171,23 +116,15 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-white flex justify-center">
       {/* Centered container for both columns */}
-      <div className="flex flex-col-reverse md:flex-row gap-8 w-full max-w-[1150px]">
+      <div className="flex flex-col-reverse md:flex-row items-stretch gap-8 w-full max-w-[1150px]">
         {/* Left Column: fully scrollable copy */}
         <div
           ref={textContainerRef}
           className="w-full md:w-[561px] overflow-y-auto h-screen hide-scrollbar"
-          style={
-            !atBottom
-              ? {
-                  WebkitMaskImage: `linear-gradient(to bottom, transparent, black ${maskOffset})`,
-                  maskImage: `linear-gradient(to bottom, transparent, black ${maskOffset})`,
-                }
-              : {}
-          }
         >
           <div className="p-8 lg:p-16">
             {/* The title is hidden on small screens and only shown on md and up */}
-            <h1 className="hidden md:block text-4xl font-black mb-8 text-6xl tracking-[-0.055em]">
+            <h1 className="hidden md:block text-4xl font-black text-zinc-800 mb-8 text-6xl tracking-[-0.055em]">
               Founders Inc.
             </h1>
             <CTAButton
@@ -229,7 +166,7 @@ export default function Home() {
                 </div>
               </div>
             </div>
-            <h2 className="text-[32px] font-bold mb-6 tracking-[-0.055em]">
+            <h2 className="text-[32px] font-bold mb-6 text-zinc-800 tracking-[-0.055em]">
               [ship it]
             </h2>
             <p className="mb-6 tracking-[-0.055em] text-[22.5px]">
@@ -237,30 +174,32 @@ export default function Home() {
               of Fort Mason, SF.
             </p>
             <p className="mb-8 tracking-[-0.055em] text-[22.5px]">
-              50 teams will be selected to make 10 years of progress in 30 days.
+              50 teams will be invited to gain life changing momentum in 30
+              days.
             </p>
             <p className="mb-6 tracking-[-0.055em] text-[22.5px]">tldr;</p>
 
             <ul className="space-y-6 mb-8">
               <li className="flex gap-4">
-                <span className="font-medium">1.</span>
+                <span className="font-large text-[22.5px]">1.</span>
                 <p className="tracking-[-0.055em] text-[22.5px]">
-                  full access to our SF lab, where you can work alongside 100s
+                  full access to our SF lab, where you can work alongside 100+
                   of builders 1-3 steps ahead of you.
                 </p>
               </li>
               <li className="flex gap-4">
-                <span className="font-medium">2.</span>
+                <span className="font-large text-[22.5px]">2.</span>
                 <p className="tracking-[-0.055em] text-[22.5px]">
                   office hours with our team + founders to help you figure out
                   growth, marketing, product &amp; what to focus on.
                 </p>
               </li>
               <li className="flex gap-4">
-                <span className="font-medium">3.</span>
+                <span className="font-large text-[22.5px]">3.</span>
                 <p className="tracking-[-0.055em] text-[22.5px]">
                   A final demo day where you could get funded to go all in on
-                  your startup. We&apos;ll be investing $1,000,000 this round.
+                  your startup. We&apos;re looking to invest $1,000,000 this
+                  round.
                 </p>
               </li>
             </ul>
@@ -291,7 +230,7 @@ export default function Home() {
             <section className="space-y-6 mb-12">
               <h2 className="text-2xl font-semibold">But...</h2>
               <p className="tracking-[-0.055em] text-[22.5px]">
-                You&apos;re probably wondering what this is.
+                You&apos;re probably wondering who we are.
               </p>
               <p className="tracking-[-0.055em] text-[22.5px]">
                 We&apos;re Founders, Inc.
@@ -308,14 +247,19 @@ export default function Home() {
                 you.
               </p>
               <p className="tracking-[-0.055em] text-[22.5px]">
-                But we do a whole lot more than just write a check.
+                But we do not exist to just write checks. It&apos;s not what
+                drives us to do what we do.
+              </p>
+              <p className="tracking-[-0.055em] text-[22.5px]">
+                We exist to find you, someone who&apos;s been overlooked,
+                working on something they know will leave a mark.
               </p>
               <p className="tracking-[-0.055em] text-[22.5px]">
                 Working w/ us means you have a permanent home for life at our SF
                 lab.
               </p>
               <p className="tracking-[-0.055em] text-[22.5px]">
-                Whether you pivot, shut down, or go to the moon, we&apos;ll be
+                Whether you pivot, shut down, or buy 6 Miatas, we&apos;ll be
                 here to support you.
               </p>
               <p className="tracking-[-0.055em] text-[22.5px]">
@@ -323,7 +267,7 @@ export default function Home() {
                 it really takes to make it.
               </p>
               <p className="tracking-[-0.055em] text-[22.5px]">
-                It&apos;s not MRR, PMF, etc.
+                It&apos;s not just MRR, PMF, etc.
               </p>
               <p className="tracking-[-0.055em] text-[22.5px]">
                 It&apos;s being more ambitious &amp; resilient than anyone on
@@ -331,7 +275,7 @@ export default function Home() {
               </p>
               <p className="tracking-[-0.055em] text-[22.5px]">
                 &amp; that&apos;s our goal. To give you the perfect environment
-                to become that.
+                to become that person.
               </p>
               <p className="tracking-[-0.055em] text-[22.5px]">
                 Our sole belief is that when we bring together ambitious people
@@ -350,10 +294,7 @@ export default function Home() {
           </div>
         </div>
         {/* Right Column: sticky video with dashed overlay */}
-        <div
-          className="relative w-full md:w-[561px] bg-black overflow-hidden max-h-[50vh] md:max-h-full"
-          style={{ height: "calc(100vh - 2rem)" }}
-        >
+        <div className="relative w-full md:w-[561px] bg-black overflow-hidden h-screen">
           <video
             ref={videoRef}
             autoPlay

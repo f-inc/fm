@@ -22,7 +22,7 @@ export function CTAButton({
         "inline-block px-14 py-[22px] transition-colors duration-200 tracking-[-0.055em] font-semibold text-[1.25rem]",
         variant === "outline" &&
           "border border-dashed border-zinc-400 hover:border-zinc-600",
-        variant === "solid" && "bg-zinc-900 text-white hover:bg-zinc-800",
+        variant === "solid" && "bg-zinc-800 text-white hover:bg-zinc-800",
         className
       )}
     >
