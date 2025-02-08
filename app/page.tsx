@@ -13,36 +13,46 @@ function formatTime(seconds: number) {
 }
 
 export default function Home() {
+  // Audio state / refs
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  // Ref for the scrollable text container
-  const textContainerRef = useRef<HTMLDivElement>(null);
+  // Video refs (separate for desktop and mobile)
+  const videoDesktopRef = useRef<HTMLVideoElement | null>(null);
+  const videoMobileRef = useRef<HTMLVideoElement | null>(null);
 
-  const videoRef = useRef<HTMLVideoElement>(null);
+  // Breakpoint: md (>=768px) is desktop
+  const [isDesktop, setIsDesktop] = useState(true);
 
+  useEffect(() => {
+    const handleResize = () => {
+      setIsDesktop(window.innerWidth >= 768);
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  // Audio events handling
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
 
-    // Force the browser to load the audio metadata
     audio.load();
 
     const handleLoadedMetadata = () => {
-      console.log("Loaded metadata:", audio.duration);
       setDuration(audio.duration);
     };
 
     audio.addEventListener("loadedmetadata", handleLoadedMetadata);
-
-    // Update current time while the audio is playing
-    audio.addEventListener("timeupdate", () => {
+    const handleTimeUpdate = () => {
       setCurrentTime(audio.currentTime);
-    });
+    };
+    audio.addEventListener("timeupdate", handleTimeUpdate);
 
-    // Reset state when audio ends
     audio.addEventListener("ended", () => {
       setIsPlaying(false);
       setCurrentTime(0);
@@ -50,68 +60,68 @@ export default function Home() {
 
     return () => {
       audio.removeEventListener("loadedmetadata", handleLoadedMetadata);
+      audio.removeEventListener("timeupdate", handleTimeUpdate);
       audio.pause();
     };
   }, []);
 
+  // Attach HLS to the visible video element (desktop or mobile)
   useEffect(() => {
-    if (videoRef.current) {
-      if (Hls.isSupported()) {
-        const hls = new Hls({
-          autoStartLoad: true,
-          startLevel: 0, // Start with lowest quality
-          maxBufferLength: 30, // Reduce buffer length for mobile
-          maxMaxBufferLength: 60,
-          backBufferLength: 30,
-          enableWorker: true,
-          lowLatencyMode: true, // Enable low latency for mobile
-          progressive: true, // Enable progressive download
-          // More conservative bandwidth estimation for mobile
-          abrEwmaDefaultEstimate: 500000, // 500kbps default
-          abrEwmaFastLive: 3,
-          abrEwmaSlowLive: 9,
-        });
+    const videoElement = isDesktop
+      ? videoDesktopRef.current
+      : videoMobileRef.current;
+    if (!videoElement) return;
 
-        hls.loadSource("/index.m3u8");
-        hls.attachMedia(videoRef.current);
+    const source = isDesktop ? "/desktop/index.m3u8" : "/mobile/index.m3u8";
 
-        hls.on(Hls.Events.ERROR, (event, data) => {
-          console.error("HLS error:", data);
-          if (data.fatal) {
-            switch (data.type) {
-              case Hls.ErrorTypes.NETWORK_ERROR:
-                hls.startLoad(); // Try to recover
-                break;
-              case Hls.ErrorTypes.MEDIA_ERROR:
-                hls.recoverMediaError(); // Try to recover
-                break;
-              default:
-                hls.destroy();
-                break;
-            }
+    if (Hls.isSupported()) {
+      const hls = new Hls({
+        autoStartLoad: true,
+        startLevel: 0,
+        maxBufferLength: 30,
+        maxMaxBufferLength: 60,
+        backBufferLength: 30,
+        enableWorker: true,
+        lowLatencyMode: true,
+        progressive: true,
+        abrEwmaDefaultEstimate: 500000,
+        abrEwmaFastLive: 3,
+        abrEwmaSlowLive: 9,
+      });
+
+      hls.loadSource(source);
+      hls.attachMedia(videoElement);
+
+      hls.on(Hls.Events.ERROR, (event, data) => {
+        console.error("HLS error:", data);
+        if (data.fatal) {
+          switch (data.type) {
+            case Hls.ErrorTypes.NETWORK_ERROR:
+              hls.startLoad();
+              break;
+            case Hls.ErrorTypes.MEDIA_ERROR:
+              hls.recoverMediaError();
+              break;
+            default:
+              hls.destroy();
+              break;
           }
-        });
+        }
+      });
 
-        return () => {
-          hls.destroy();
-        };
-      } else if (
-        videoRef.current.canPlayType("application/vnd.apple.mpegurl")
-      ) {
-        // Native HLS support (iOS Safari)
-        videoRef.current.src = "/index.m3u8";
-      }
+      return () => {
+        hls.destroy();
+      };
+    } else if (videoElement.canPlayType("application/vnd.apple.mpegurl")) {
+      videoElement.src = source;
     }
-  }, []);
+  }, [isDesktop]);
 
   const togglePlay = () => {
     if (!audioRef.current) return;
-
     if (isPlaying) {
       audioRef.current.pause();
     } else {
-      // Safari may reject play() if not triggered by a trusted event,
-      // so catch and log any potential error.
       audioRef.current
         .play()
         .catch((err) => console.error("Audio playback error:", err));
@@ -122,61 +132,125 @@ export default function Home() {
   const progress = duration ? (currentTime / duration) * 100 : 0;
 
   return (
-    <div className="min-h-screen bg-white flex justify-center">
-      {/* Centered container for both columns */}
-      <div className="flex flex-col-reverse md:flex-row items-stretch gap-8 w-full max-w-[1150px]">
-        {/* Left Column: fully scrollable copy */}
-        <div
-          ref={textContainerRef}
-          className="w-full md:w-[561px] overflow-y-auto h-screen hide-scrollbar"
-        >
+    <div className="min-h-screen bg-white flex flex-col justify-center">
+      {/* Mobile Video Container */}
+      {!isDesktop && (
+        <div className="w-full bg-black overflow-hidden h-[55vh] relative mb-8">
+          <video
+            ref={videoMobileRef}
+            autoPlay
+            loop
+            muted
+            poster="/video-poster.jpg"
+            playsInline
+            className="absolute inset-0 w-full h-full object-cover"
+            x-webkit-airplay="allow"
+            x-webkit-playsinline="true"
+            controlsList="nodownload"
+          />
+          <div className="absolute inset-0 bg-[rgba(0,0,0,0.50)]" />
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-6">
+            <div className="relative w-[288px] h-[77px]">
+              <Image
+                alt="4 weeks"
+                fill
+                src="/4weeks.svg"
+                style={{ objectFit: "cover" }}
+              />
+            </div>
+            <div className="relative w-[288px] h-[77px]">
+              <Image
+                alt="Feb 24th"
+                fill
+                src="/feb24.svg"
+                style={{ objectFit: "cover" }}
+              />
+            </div>
+            <div className="relative w-[288px] h-[77px]">
+              <Image
+                alt="SF"
+                fill
+                src="/SF.svg"
+                style={{ objectFit: "cover" }}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Main Content Container */}
+      <div className="flex flex-col md:flex-row items-stretch gap-8 w-full max-w-[1150px]">
+        {/* Left Column: Text & Audio UI */}
+        <div className="w-full md:w-[561px] overflow-y-auto h-screen hide-scrollbar">
           <div className="p-8 lg:p-16">
-            {/* The title is hidden on small screens and only shown on md and up */}
-            <h1 className="hidden md:block font-black text-zinc-800 mb-8 text-6xl tracking-[-0.055em]">
+            {/* Title (desktop only) */}
+            <h1
+              onClick={() => {
+                window.open("https://f.inc", "_blank");
+              }}
+              className="hidden hover:cursor-pointer md:block font-black text-zinc-800 mb-8 text-6xl tracking-[-0.055em]"
+            >
               Founders Inc.
             </h1>
-            <CTAButton
-              href="https://tally.so/r/3X8ypP"
-              variant="solid"
-              className="mb-12"
-            >
-              join us - apply here
-            </CTAButton>
-            {/* Audio player UI */}
-            <div className="flex flex-wrap items-center gap-4 mb-8">
-              <button className="p-2 text-[#3a3a3a]" onClick={togglePlay}>
-                <svg
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  {isPlaying ? (
-                    <path
-                      d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"
-                      fill="currentColor"
-                    />
-                  ) : (
-                    <path d="M8 5V19L19 12L8 5Z" fill="currentColor" />
-                  )}
-                </svg>
-              </button>
-              <div className="flex-1 flex flex-wrap items-center gap-4">
-                <div className="h-1 flex-1 bg-gray-200 rounded-full">
-                  <div
-                    className="h-full bg-[#3a3a3a] rounded-full transition-all duration-300"
-                    style={{ width: `${progress}%` }}
-                  ></div>
-                </div>
-                <div className="text-md text-[#3a3a3a]">
-                  {formatTime(currentTime)} / {formatTime(duration)}
-                </div>
+            {/* CTA Button for desktop (rendered above heading) */}
+            {isDesktop && (
+              <div className="mb-12 flex justify-center md:justify-start">
+                <CTAButton href="https://tally.so/r/3X8ypP" variant="solid">
+                  join us - apply here
+                </CTAButton>
               </div>
-            </div>
-            <h2 className="text-[32px] font-bold mb-6 text-zinc-800 tracking-[-0.055em]">
+            )}
+            {/* [ship it] Heading */}
+            <h2
+              className={`font-bold mb-6 text-zinc-800 tracking-[-0.055em] ${
+                isDesktop ? "text-[32px]" : "text-[36px]"
+              }`}
+            >
               [ship it]
             </h2>
+            {/* For mobile, the CTA Button is rendered right below the heading */}
+            {!isDesktop && (
+              <div className="mb-12 flex">
+                <CTAButton href="https://tally.so/r/3X8ypP" variant="solid">
+                  join us - apply here
+                </CTAButton>
+              </div>
+            )}
+            {/* Audio Player UI (only on desktop) */}
+            {isDesktop && (
+              <div className="flex flex-wrap items-center gap-4 mb-8">
+                <button className="p-2 text-[#3a3a3a]" onClick={togglePlay}>
+                  <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    {isPlaying ? (
+                      <path
+                        d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"
+                        fill="currentColor"
+                      />
+                    ) : (
+                      <path d="M8 5V19L19 12L8 5Z" fill="currentColor" />
+                    )}
+                  </svg>
+                </button>
+                <div className="flex-1 flex flex-wrap items-center gap-4">
+                  <div className="h-1 flex-1 bg-gray-200 rounded-full">
+                    <div
+                      className="h-full bg-[#3a3a3a] rounded-full transition-all duration-300"
+                      style={{ width: `${progress}%` }}
+                    ></div>
+                  </div>
+                  <div className="text-md text-[#3a3a3a]">
+                    {formatTime(currentTime)} / {formatTime(duration)}
+                  </div>
+                </div>
+              </div>
+            )}
+            {/* Additional Text Content */}
             <p className="mb-6 tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
               We&apos;re running a 4 week sprint from Feb 24th to March 21st out
               of Fort Mason, SF.
@@ -188,7 +262,6 @@ export default function Home() {
             <p className="mb-6 tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
               tldr;
             </p>
-
             <ul className="space-y-6 mb-8">
               <li className="flex gap-4">
                 <span className="font-large text-[22.5px] text-[#3a3a3a]">
@@ -219,7 +292,6 @@ export default function Home() {
                 </p>
               </li>
             </ul>
-
             <div className="space-y-6 mb-12">
               <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
                 Every week you&apos;ll set a goal &amp; we&apos;ll give you
@@ -242,7 +314,6 @@ export default function Home() {
                 you&apos;re building.
               </p>
             </div>
-
             <section className="space-y-6 mb-12">
               <h2 className="text-2xl font-semibold">But...</h2>
               <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
@@ -303,57 +374,58 @@ export default function Home() {
                 &amp; all the resources that brings.
               </p>
             </section>
-
             <CTAButton href="https://tally.so/r/3X8ypP" variant="solid">
               we built this for you - join us
             </CTAButton>
           </div>
         </div>
-        {/* Right Column: sticky video with dashed overlay */}
-        <div className="relative w-full md:w-[561px] bg-black overflow-hidden h-screen">
-          <video
-            ref={videoRef}
-            autoPlay
-            loop
-            muted
-            poster="/video-poster.jpg"
-            playsInline
-            className="absolute inset-0 w-full h-full object-cover"
-            x-webkit-airplay="allow"
-            x-webkit-playsinline="true"
-            controlsList="nodownload"
-          />
-          <div className="absolute inset-0 bg-[rgba(0,0,0,0.50)]" />
-          <div className="absolute inset-0 flex flex-col items-center justify-center gap-6">
-            <div className="relative w-[288px] h-[77px]">
-              <Image
-                alt="4 weeks"
-                fill
-                src="/4weeks.svg"
-                style={{ objectFit: "cover" }}
-              />
-            </div>
-            <div className="relative w-[288px] h-[77px]">
-              <Image
-                alt="Feb 24th"
-                fill
-                src="/feb24.svg"
-                style={{ objectFit: "cover" }}
-              />
-            </div>
-            <div className="relative w-[288px] h-[77px]">
-              <Image
-                alt="SF"
-                fill
-                src="/SF.svg"
-                style={{ objectFit: "cover" }}
-              />
+
+        {/* Desktop Video Container */}
+        {isDesktop && (
+          <div className="relative w-full md:w-[561px] bg-black overflow-hidden h-screen">
+            <video
+              ref={videoDesktopRef}
+              autoPlay
+              loop
+              muted
+              poster="/video-poster.jpg"
+              playsInline
+              className="absolute inset-0 w-full h-full object-cover"
+              x-webkit-airplay="allow"
+              x-webkit-playsinline="true"
+              controlsList="nodownload"
+            />
+            <div className="absolute inset-0 bg-[rgba(0,0,0,0.50)]" />
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-6">
+              <div className="relative w-[288px] h-[77px]">
+                <Image
+                  alt="4 weeks"
+                  fill
+                  src="/4weeks.svg"
+                  style={{ objectFit: "cover" }}
+                />
+              </div>
+              <div className="relative w-[288px] h-[77px]">
+                <Image
+                  alt="Feb 24th"
+                  fill
+                  src="/feb24.svg"
+                  style={{ objectFit: "cover" }}
+                />
+              </div>
+              <div className="relative w-[288px] h-[77px]">
+                <Image
+                  alt="SF"
+                  fill
+                  src="/SF.svg"
+                  style={{ objectFit: "cover" }}
+                />
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
-
-      {/* Hidden audio element added to the DOM for improved compatibility in Safari */}
+      {/* Hidden Audio Element */}
       <audio
         ref={audioRef}
         src="/seeyourselfinmyeyes.mp3"
