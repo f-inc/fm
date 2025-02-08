@@ -132,10 +132,10 @@ export default function Home() {
   const progress = duration ? (currentTime / duration) * 100 : 0;
 
   return (
-    <div className="min-h-screen bg-white flex flex-col justify-center">
+    <div className="min-h-screen bg-white flex flex-col justify-center items-center ">
       {/* Mobile Video Container */}
       {!isDesktop && (
-        <div className="w-full bg-black overflow-hidden h-[55vh] relative mb-8">
+        <div className="w-full bg-black overflow-hidden h-[55vh] relative mb-8 items-center ">
           <video
             ref={videoMobileRef}
             autoPlay
