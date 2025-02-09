@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 // import localFont from "next/font/local";
 import "./globals.css";
+import { CSPostHogProvider } from "./providers";
 
 import { Inter } from "next/font/google";
 
@@ -33,7 +34,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} antialiased`}>{children}</body>
+      <CSPostHogProvider>
+        <body className={`${inter.variable} antialiased`}>{children}</body>
+      </CSPostHogProvider>
     </html>
   );
 }
