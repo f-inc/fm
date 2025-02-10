@@ -181,7 +181,7 @@ export default function Home() {
       {/* Main Content Container */}
       <div className="flex flex-col md:flex-row items-stretch gap-8 w-full max-w-[1150px]">
         {/* Left Column: Text & Audio UI */}
-        <div className="w-full md:w-[561px] overflow-y-auto h-screen hide-scrollbar">
+        <div className="w-full md:w-[561px] overflow-y-auto md:h-screen hide-scrollbar">
           <div className="p-8 lg:p-16">
             {/* Title (desktop only) */}
             <h1
