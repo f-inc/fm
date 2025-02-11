@@ -22,9 +22,30 @@ const inter = Inter({
 // });
 
 export const metadata: Metadata = {
-  title: "Founders Inc. | Ship It",
+  title: "Founders Inc. [Ship It]",
   description:
     "Ship It is a 4 week sprint from Feb 24th to March 21st out of Fort Mason, SF.",
+  openGraph: {
+    title: "Founders Inc. [Ship It]",
+    description:
+      "Ship It is a 4 week sprint from Feb 24th to March 21st out of Fort Mason, SF.",
+    url: "https://shipit.f.inc",
+    siteName: "Founders Inc. Ship It",
+    images: [
+      {
+        url: "/og.png",
+        width: 800,
+        height: 600,
+      },
+      {
+        url: "/og.png",
+        width: 1200,
+        height: 630,
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
 };
 
 export default function RootLayout({

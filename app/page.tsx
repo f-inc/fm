@@ -1,6 +1,5 @@
 "use client";
 
-import Head from "next/head";
 import Image from "next/image";
 import { useRef, useState, useEffect } from "react";
 import Hls from "hls.js";
@@ -134,15 +133,6 @@ export default function Home() {
 
   return (
     <>
-      <Head>
-        <meta property="og:image" content="/og.png" />
-        <meta property="og:title" content="Founders Inc." />
-        <meta
-          property="og:description"
-          content="Join Founders Inc. - a home for founders building something great. Learn more and apply now!"
-        />
-        <meta property="og:type" content="website" />
-      </Head>
       <div className="min-h-screen bg-white flex flex-col justify-center items-center ">
         {/* Mobile Video Container */}
         {!isDesktop && (
