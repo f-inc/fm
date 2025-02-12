@@ -26,6 +26,9 @@ export default function Home() {
   // Breakpoint: md (>=768px) is desktop
   const [isDesktop, setIsDesktop] = useState(true);
 
+  // Add state for section visibility
+  const [isExpanded, setIsExpanded] = useState(false);
+
   useEffect(() => {
     const handleResize = () => {
       setIsDesktop(window.innerWidth >= 768);
@@ -315,68 +318,107 @@ export default function Home() {
                   you&apos;re building.
                 </p>
               </div>
-              <section className="space-y-6 mb-12">
-                <h2 className="text-2xl font-semibold">But...</h2>
-                <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
-                  You&apos;re probably wondering who we are.
-                </p>
-                <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
-                  We&apos;re Founders, Inc.
-                </p>
-                <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
-                  Over the last 3 years we&apos;ve built what we call a
-                  &apos;home for founders&apos;.
-                </p>
-                <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
-                  Yes, we&apos;re a VC.
-                </p>
-                <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
-                  We invest in early stage founders & hopefully that means you.
-                </p>
-                <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
-                  But we do not exist to just write checks. It&apos;s not what
-                  drives us to do what we do.
-                </p>
-                <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
-                  We exist to find you, someone who&apos;s been overlooked,
-                  working on something they know will leave a mark.
-                </p>
-                <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
-                  Working w/ us means we will have your back for the rest of
-                  your life.
-                </p>
-                <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
-                  Whether you pivot, shut down, or buy 6 Miatas, we&apos;ll be
-                  here to support you.
-                </p>
-                <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
-                  Because we&apos;re founders too, & we deeply understand what
-                  it really takes to make it.
-                </p>
-                <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
-                  It&apos;s not just MRR, PMF, etc.
-                </p>
-                <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
-                  It&apos;s being more ambitious & resilient than anyone on
-                  earth.
-                </p>
-                <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
-                  & that&apos;s our goal. To give you the perfect environment to
-                  become that person.
-                </p>
-                <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
-                  Our sole belief is that when we bring together ambitious
-                  people to work shoulder to shoulder, eat together & share
-                  ideas, great things happen.
-                </p>
-                <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
-                  So that&apos;s what this is: a genuine community of founders &
-                  all the resources that brings.
-                </p>
-              </section>
+
               <CTAButton href="https://tally.so/r/3X8ypP" variant="solid">
                 we built this for you - join us
               </CTAButton>
+
+              {/* Collapsible section moved below with added spacing */}
+              <div className="mt-16 mb-12">
+                <button
+                  onClick={() => setIsExpanded(!isExpanded)}
+                  className="flex items-center gap-2 text-[22.5px] text-[#3a3a3a] hover:opacity-80 transition-opacity"
+                >
+                  <span className="font-semibold">
+                    But you're probably wondering ...
+                  </span>
+                  <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    className={`transform transition-transform duration-300 ${
+                      isExpanded ? "rotate-180" : ""
+                    }`}
+                  >
+                    <path
+                      d="M7 10l5 5 5-5"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </button>
+
+                <div
+                  className={`overflow-hidden transition-all duration-500 ease-in-out ${
+                    isExpanded
+                      ? "max-h-[2000px] opacity-100 mt-6"
+                      : "max-h-0 opacity-0"
+                  }`}
+                >
+                  <div className="space-y-6">
+                    <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
+                      You&apos;re probably wondering who we are.
+                    </p>
+                    <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
+                      We&apos;re Founders, Inc.
+                    </p>
+                    <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
+                      Over the last 3 years we&apos;ve built what we call a
+                      &apos;home for founders&apos;.
+                    </p>
+                    <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
+                      Yes, we&apos;re a VC.
+                    </p>
+                    <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
+                      We invest in early stage founders & hopefully that means
+                      you.
+                    </p>
+                    <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
+                      But we do not exist to just write checks. It&apos;s not
+                      what drives us to do what we do.
+                    </p>
+                    <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
+                      We exist to find you, someone who&apos;s been overlooked,
+                      working on something they know will leave a mark.
+                    </p>
+                    <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
+                      Working w/ us means we will have your back for the rest of
+                      your life.
+                    </p>
+                    <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
+                      Whether you pivot, shut down, or buy 6 Miatas, we&apos;ll
+                      be here to support you.
+                    </p>
+                    <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
+                      Because we&apos;re founders too, & we deeply understand
+                      what it really takes to make it.
+                    </p>
+                    <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
+                      It&apos;s not just MRR, PMF, etc.
+                    </p>
+                    <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
+                      It&apos;s being more ambitious & resilient than anyone on
+                      earth.
+                    </p>
+                    <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
+                      & that&apos;s our goal. To give you the perfect
+                      environment to become that person.
+                    </p>
+                    <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
+                      Our sole belief is that when we bring together ambitious
+                      people to work shoulder to shoulder, eat together & share
+                      ideas, great things happen.
+                    </p>
+                    <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
+                      So that&apos;s what this is: a genuine community of
+                      founders & all the resources that brings.
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
