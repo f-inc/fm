@@ -330,7 +330,7 @@ export default function Home() {
                   className="flex items-center gap-2 text-[22.5px] text-[#3a3a3a] hover:opacity-80 transition-opacity"
                 >
                   <span className="font-semibold">
-                    But you're probably wondering ...
+                    But you&apos;re probably wondering ...
                   </span>
                   <svg
                     width="24"
