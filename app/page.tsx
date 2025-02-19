@@ -5,11 +5,84 @@ import { useRef, useState, useEffect } from "react";
 import Hls from "hls.js";
 
 import { CTAButton } from "@/components/cta-button";
+import { AnimatedCounter } from "@/components/ui/animated-counter";
 
 function formatTime(seconds: number) {
   const minutes = Math.floor(seconds / 60);
   const remainingSeconds = Math.floor(seconds % 60);
   return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
+}
+
+/* CountdownTimer component that shows days/hours/minutes/seconds until the target date */
+function CountdownTimer() {
+  const [timeLeft, setTimeLeft] = useState(() => {
+    // Calculate initial time difference
+    const targetDate = new Date("2025-02-21T00:00:00");
+    const now = new Date();
+    const difference = targetDate.getTime() - now.getTime();
+
+    if (difference <= 0) {
+      return { days: 0, hours: 0, minutes: 0, seconds: 0 };
+    }
+
+    return {
+      days: Math.floor(difference / (1000 * 60 * 60 * 24)),
+      hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
+      minutes: Math.floor((difference / 1000 / 60) % 60),
+      seconds: Math.floor((difference / 1000) % 60),
+    };
+  });
+
+  useEffect(() => {
+    // Target date: Friday night, February 21, 2025 at midnight
+    const targetDate = new Date("2025-02-21T00:00:00");
+
+    const interval = setInterval(() => {
+      const now = new Date();
+      const difference = targetDate.getTime() - now.getTime();
+
+      if (difference <= 0) {
+        clearInterval(interval);
+        setTimeLeft({
+          days: 0,
+          hours: 0,
+          minutes: 0,
+          seconds: 0,
+        });
+      } else {
+        const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((difference / (1000 * 60 * 60)) % 24);
+        const minutes = Math.floor((difference / 1000 / 60) % 60);
+        const seconds = Math.floor((difference / 1000) % 60);
+        setTimeLeft({ days, hours, minutes, seconds });
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div className="flex items-center justify-center my-8 text-[22.5px] tracking-[-0.055em] text-[#3a3a3a]">
+      <div className="flex items-center space-x-2">
+        <div className="flex items-center gap-0">
+          <AnimatedCounter value={timeLeft.days} />
+          <span>d</span>
+        </div>
+        <div className="flex items-center gap-0">
+          <AnimatedCounter value={timeLeft.hours} />
+          <span>h</span>
+        </div>
+        <div className="flex items-center gap-0">
+          <AnimatedCounter value={timeLeft.minutes} />
+          <span>m</span>
+        </div>
+        <div className="flex items-center gap-0">
+          <AnimatedCounter value={timeLeft.seconds} />
+          <span>s</span>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export default function Home() {
@@ -182,6 +255,9 @@ export default function Home() {
           </div>
         )}
 
+        {/* Big Countdown Timer */}
+        <CountdownTimer />
+
         {/* Main Content Container */}
         <div className="flex flex-col md:flex-row items-stretch gap-8 w-full max-w-[1150px]">
           {/* Left Column: Text & Audio UI */}
@@ -256,8 +332,8 @@ export default function Home() {
               )}
               {/* Additional Text Content */}
               <p className="mb-6 tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
-                We&apos;re running a 4 week sprint from Feb 24th to March 21st
-                out of Fort Mason, SF.
+                We're running a 4 week sprint from Feb 24th to March 21st out of
+                Fort Mason, SF.
               </p>
               <p className="mb-8 tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
                 50 teams will be invited to gain life changing momentum in 30
@@ -291,46 +367,43 @@ export default function Home() {
                   </span>
                   <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
                     a final demo day where you could get funded to go all in on
-                    your startup. We&apos;re looking to invest $1,000,000 this
-                    round.
+                    your startup. We're looking to invest $1,000,000 this round.
                   </p>
                 </li>
               </ul>
               <div className="space-y-6 mb-12">
                 <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
-                  Every week you&apos;ll set a goal & we&apos;ll give you
-                  everything we have to make it happen.
+                  Every week you'll set a goal & we'll give you everything we
+                  have to make it happen.
                 </p>
                 <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
-                  At the end of each week, you&apos;ll present your progress in
-                  front of the whole batch.
+                  At the end of each week, you'll present your progress in front
+                  of the whole batch.
                 </p>
                 <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
-                  If you kill it, you&apos;ll get your first check and a
-                  permanent home for life at our SF lab.
+                  If you kill it, you'll get your first check and a permanent
+                  home for life at our SF lab.
                 </p>
                 <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
-                  We&apos;re looking for the most ambitious founders around the
+                  We're looking for the most ambitious founders around the
                   world.
                 </p>
                 <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
-                  If that sounds like you - tell us who you are & what
-                  you&apos;re building.
+                  If that sounds like you - tell us who you are & what you're
+                  building.
                 </p>
               </div>
-
               <CTAButton href="https://tally.so/r/3X8ypP" variant="solid">
                 we built this for you - join us
               </CTAButton>
-
-              {/* Collapsible section moved below with added spacing */}
+              {/* Collapsible section */}
               <div className="mt-16 mb-12">
                 <button
                   onClick={() => setIsExpanded(!isExpanded)}
                   className="flex items-center gap-2 text-[22.5px] text-[#3a3a3a] hover:opacity-80 transition-opacity"
                 >
                   <span className="font-semibold">
-                    But you&apos;re probably wondering ...
+                    But you're probably wondering ...
                   </span>
                   <svg
                     width="24"
@@ -350,7 +423,6 @@ export default function Home() {
                     />
                   </svg>
                 </button>
-
                 <div
                   className={`overflow-hidden transition-all duration-500 ease-in-out ${
                     isExpanded
@@ -360,28 +432,28 @@ export default function Home() {
                 >
                   <div className="space-y-6">
                     <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
-                      You&apos;re probably wondering who we are.
+                      You're probably wondering who we are.
                     </p>
                     <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
-                      We&apos;re Founders, Inc.
+                      We're Founders, Inc.
                     </p>
                     <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
-                      Over the last 3 years we&apos;ve built what we call a
-                      &apos;home for founders&apos;.
+                      Over the last 3 years we've built what we call a 'home for
+                      founders'.
                     </p>
                     <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
-                      Yes, we&apos;re a VC.
+                      Yes, we're a VC.
                     </p>
                     <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
                       We invest in early stage founders & hopefully that means
                       you.
                     </p>
                     <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
-                      But we do not exist to just write checks. It&apos;s not
-                      what drives us to do what we do.
+                      But we do not exist to just write checks. It's not what
+                      drives us to do what we do.
                     </p>
                     <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
-                      We exist to find you, someone who&apos;s been overlooked,
+                      We exist to find you, someone who's been overlooked,
                       working on something they know will leave a mark.
                     </p>
                     <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
@@ -389,23 +461,23 @@ export default function Home() {
                       your life.
                     </p>
                     <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
-                      Whether you pivot, shut down, or buy 6 Miatas, we&apos;ll
-                      be here to support you.
+                      Whether you pivot, shut down, or buy 6 Miatas, we'll be
+                      here to support you.
                     </p>
                     <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
-                      Because we&apos;re founders too, & we deeply understand
-                      what it really takes to make it.
+                      Because we're founders too, & we deeply understand what it
+                      really takes to make it.
                     </p>
                     <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
-                      It&apos;s not just MRR, PMF, etc.
+                      It's not just MRR, PMF, etc.
                     </p>
                     <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
-                      It&apos;s being more ambitious & resilient than anyone on
+                      It's being more ambitious & resilient than anyone on
                       earth.
                     </p>
                     <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
-                      & that&apos;s our goal. To give you the perfect
-                      environment to become that person.
+                      & that's our goal. To give you the perfect environment to
+                      become that person.
                     </p>
                     <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
                       Our sole belief is that when we bring together ambitious
@@ -413,8 +485,8 @@ export default function Home() {
                       ideas, great things happen.
                     </p>
                     <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
-                      So that&apos;s what this is: a genuine community of
-                      founders & all the resources that brings.
+                      So that's what this is: a genuine community of founders &
+                      all the resources that brings.
                     </p>
                   </div>
                 </div>
