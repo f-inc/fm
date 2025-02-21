@@ -16,71 +16,130 @@ function formatTime(seconds: number) {
 /* CountdownTimer component that shows days/hours/minutes/seconds until the target date */
 function CountdownTimer() {
   const [timeLeft, setTimeLeft] = useState(() => {
-    // Calculate initial time difference
     const targetDate = new Date("2025-02-21T00:00:00");
+    const nextDay = new Date("2025-02-22T00:00:00");
     const now = new Date();
-    const difference = targetDate.getTime() - now.getTime();
-
-    if (difference <= 0) {
-      return { days: 0, hours: 0, minutes: 0, seconds: 0 };
-    }
+    const originalDifference = targetDate.getTime() - now.getTime();
+    const extensionDifference = nextDay.getTime() - now.getTime();
+    const isNegative = originalDifference < 0;
 
     return {
-      days: Math.floor(difference / (1000 * 60 * 60 * 24)),
-      hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
-      minutes: Math.floor((difference / 1000 / 60) % 60),
-      seconds: Math.floor((difference / 1000) % 60),
+      isNegative,
+      original: {
+        days: Math.max(
+          0,
+          Math.floor(originalDifference / (1000 * 60 * 60 * 24))
+        ),
+        hours: Math.max(
+          0,
+          Math.floor((originalDifference / (1000 * 60 * 60)) % 24)
+        ),
+        minutes: Math.max(0, Math.floor((originalDifference / 1000 / 60) % 60)),
+        seconds: Math.max(0, Math.floor((originalDifference / 1000) % 60)),
+      },
+      extension: {
+        days: Math.floor(extensionDifference / (1000 * 60 * 60 * 24)),
+        hours: Math.floor((extensionDifference / (1000 * 60 * 60)) % 24),
+        minutes: Math.floor((extensionDifference / 1000 / 60) % 60),
+        seconds: Math.floor((extensionDifference / 1000) % 60),
+      },
     };
   });
 
   useEffect(() => {
-    // Target date: Friday night, February 21, 2025 at midnight
     const targetDate = new Date("2025-02-21T00:00:00");
+    const nextDay = new Date("2025-02-22T00:00:00");
 
     const interval = setInterval(() => {
       const now = new Date();
-      const difference = targetDate.getTime() - now.getTime();
+      const originalDifference = targetDate.getTime() - now.getTime();
+      const extensionDifference = nextDay.getTime() - now.getTime();
+      const isNegative = originalDifference < 0;
 
-      if (difference <= 0) {
-        clearInterval(interval);
-        setTimeLeft({
-          days: 0,
-          hours: 0,
-          minutes: 0,
-          seconds: 0,
-        });
-      } else {
-        const days = Math.floor(difference / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((difference / (1000 * 60 * 60)) % 24);
-        const minutes = Math.floor((difference / 1000 / 60) % 60);
-        const seconds = Math.floor((difference / 1000) % 60);
-        setTimeLeft({ days, hours, minutes, seconds });
-      }
+      setTimeLeft({
+        isNegative,
+        original: {
+          days: Math.max(
+            0,
+            Math.floor(originalDifference / (1000 * 60 * 60 * 24))
+          ),
+          hours: Math.max(
+            0,
+            Math.floor((originalDifference / (1000 * 60 * 60)) % 24)
+          ),
+          minutes: Math.max(
+            0,
+            Math.floor((originalDifference / 1000 / 60) % 60)
+          ),
+          seconds: Math.max(0, Math.floor((originalDifference / 1000) % 60)),
+        },
+        extension: {
+          days: Math.floor(extensionDifference / (1000 * 60 * 60 * 24)),
+          hours: Math.floor((extensionDifference / (1000 * 60 * 60)) % 24),
+          minutes: Math.floor((extensionDifference / 1000 / 60) % 60),
+          seconds: Math.floor((extensionDifference / 1000) % 60),
+        },
+      });
     }, 1000);
 
     return () => clearInterval(interval);
   }, []);
 
   return (
-    <div className="flex items-center justify-center my-8 text-[22.5px] tracking-[-0.055em] text-[#3a3a3a]">
-      <div className="flex items-center space-x-2">
-        <div className="flex items-center gap-0">
-          <AnimatedCounter value={timeLeft.days} />
-          <span>d</span>
-        </div>
-        <div className="flex items-center gap-0">
-          <AnimatedCounter value={timeLeft.hours} />
-          <span>h</span>
-        </div>
-        <div className="flex items-center gap-0">
-          <AnimatedCounter value={timeLeft.minutes} />
-          <span>m</span>
-        </div>
-        <div className="flex items-center gap-0">
-          <AnimatedCounter value={timeLeft.seconds} />
-          <span>s</span>
+    <div className="flex flex-col items-center justify-center my-2">
+      <div
+        className={`flex items-center text-[22.5px] tracking-[-0.055em] text-[#3a3a3a] ${
+          timeLeft.isNegative ? "line-through opacity-50" : ""
+        }`}
+      >
+        <div className="flex items-center space-x-2">
+          <div className="flex items-center gap-0">
+            <AnimatedCounter value={timeLeft.original.days} />
+            <span>d</span>
+          </div>
+          <div className="flex items-center gap-0">
+            <AnimatedCounter value={timeLeft.original.hours} />
+            <span>h</span>
+          </div>
+          <div className="flex items-center gap-0">
+            <AnimatedCounter value={timeLeft.original.minutes} />
+            <span>m</span>
+          </div>
+          <div className="flex items-center gap-0">
+            <AnimatedCounter value={timeLeft.original.seconds} />
+            <span>s</span>
+          </div>
         </div>
       </div>
+
+      {timeLeft.isNegative && (
+        <>
+          <div className="flex items-center text-[22.5px] tracking-[-0.055em] text-[#3a3a3a] mt-4">
+            <div className="flex items-center space-x-2">
+              <div className="flex items-center gap-0">
+                <AnimatedCounter value={timeLeft.extension.days} />
+                <span>d</span>
+              </div>
+              <div className="flex items-center gap-0">
+                <AnimatedCounter value={timeLeft.extension.hours} />
+                <span>h</span>
+              </div>
+              <div className="flex items-center gap-0">
+                <AnimatedCounter value={timeLeft.extension.minutes} />
+                <span>m</span>
+              </div>
+              <div className="flex items-center gap-0">
+                <AnimatedCounter value={timeLeft.extension.seconds} />
+                <span>s</span>
+              </div>
+            </div>
+          </div>
+          <p className="mt-4 text-[18px] px-4 tracking-[-0.055em] text-[#3a3a3a] opacity-80">
+            yes, you missed the deadline but we&apos;re extending the apps for
+            another day
+          </p>
+        </>
+      )}
     </div>
   );
 }
@@ -332,8 +391,8 @@ export default function Home() {
               )}
               {/* Additional Text Content */}
               <p className="mb-6 tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
-                We're running a 4 week sprint from Feb 24th to March 21st out of
-                Fort Mason, SF.
+                We&apos;re running a 4 week sprint from Feb 24th to March 21st
+                out of Fort Mason, SF.
               </p>
               <p className="mb-8 tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
                 50 teams will be invited to gain life changing momentum in 30
@@ -367,30 +426,31 @@ export default function Home() {
                   </span>
                   <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
                     a final demo day where you could get funded to go all in on
-                    your startup. We're looking to invest $1,000,000 this round.
+                    your startup. We&apos;re looking to invest $1,000,000 this
+                    round.
                   </p>
                 </li>
               </ul>
               <div className="space-y-6 mb-12">
                 <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
-                  Every week you'll set a goal & we'll give you everything we
-                  have to make it happen.
+                  Every week you&apos;ll set a goal & we&apos;ll give you
+                  everything we have to make it happen.
                 </p>
                 <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
-                  At the end of each week, you'll present your progress in front
-                  of the whole batch.
+                  At the end of each week, you&apos;ll present your progress in
+                  front of the whole batch.
                 </p>
                 <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
-                  If you kill it, you'll get your first check and a permanent
-                  home for life at our SF lab.
+                  If you kill it, you&apos;ll get your first check and a
+                  permanent home for life at our SF lab.
                 </p>
                 <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
-                  We're looking for the most ambitious founders around the
+                  We&apos;re looking for the most ambitious founders around the
                   world.
                 </p>
                 <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
-                  If that sounds like you - tell us who you are & what you're
-                  building.
+                  If that sounds like you - tell us who you are & what
+                  you&apos;re building.
                 </p>
               </div>
               <CTAButton href="https://tally.so/r/3X8ypP" variant="solid">
@@ -403,7 +463,7 @@ export default function Home() {
                   className="flex items-center gap-2 text-[22.5px] text-[#3a3a3a] hover:opacity-80 transition-opacity"
                 >
                   <span className="font-semibold">
-                    But you're probably wondering ...
+                    But you&apos;re probably wondering ...
                   </span>
                   <svg
                     width="24"
@@ -432,28 +492,28 @@ export default function Home() {
                 >
                   <div className="space-y-6">
                     <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
-                      You're probably wondering who we are.
+                      You&apos;re probably wondering who we are.
                     </p>
                     <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
-                      We're Founders, Inc.
+                      We&apos;re Founders, Inc.
                     </p>
                     <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
-                      Over the last 3 years we've built what we call a 'home for
-                      founders'.
+                      Over the last 3 years we&apos;ve built what we call a
+                      &apos;home for founders&apos;.
                     </p>
                     <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
-                      Yes, we're a VC.
+                      Yes, we&apos;re a VC.
                     </p>
                     <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
                       We invest in early stage founders & hopefully that means
                       you.
                     </p>
                     <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
-                      But we do not exist to just write checks. It's not what
-                      drives us to do what we do.
+                      But we do not exist to just write checks. It&apos;s not
+                      what drives us to do what we do.
                     </p>
                     <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
-                      We exist to find you, someone who's been overlooked,
+                      We exist to find you, someone who&apos;s been overlooked,
                       working on something they know will leave a mark.
                     </p>
                     <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
@@ -461,23 +521,23 @@ export default function Home() {
                       your life.
                     </p>
                     <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
-                      Whether you pivot, shut down, or buy 6 Miatas, we'll be
-                      here to support you.
+                      Whether you pivot, shut down, or buy 6 Miatas, we&apos;ll
+                      be here to support you.
                     </p>
                     <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
-                      Because we're founders too, & we deeply understand what it
-                      really takes to make it.
+                      Because we&apos;re founders too, & we deeply understand
+                      what it really takes to make it.
                     </p>
                     <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
-                      It's not just MRR, PMF, etc.
+                      It&apos;s not just MRR, PMF, etc.
                     </p>
                     <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
-                      It's being more ambitious & resilient than anyone on
+                      It&apos;s being more ambitious & resilient than anyone on
                       earth.
                     </p>
                     <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
-                      & that's our goal. To give you the perfect environment to
-                      become that person.
+                      & that&apos;s our goal. To give you the perfect
+                      environment to become that person.
                     </p>
                     <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
                       Our sole belief is that when we bring together ambitious
@@ -485,8 +545,8 @@ export default function Home() {
                       ideas, great things happen.
                     </p>
                     <p className="tracking-[-0.055em] text-[22.5px] text-[#3a3a3a]">
-                      So that's what this is: a genuine community of founders &
-                      all the resources that brings.
+                      So that&apos;s what this is: a genuine community of
+                      founders & all the resources that brings.
                     </p>
                   </div>
                 </div>
