@@ -21,10 +21,9 @@ function CountdownTimer() {
     const now = new Date();
     const originalDifference = targetDate.getTime() - now.getTime();
     const extensionDifference = nextDay.getTime() - now.getTime();
-    const isNegative = originalDifference < 0;
 
     return {
-      isNegative,
+      isNegative: originalDifference < 0,
       original: {
         days: Math.max(
           0,
@@ -34,14 +33,26 @@ function CountdownTimer() {
           0,
           Math.floor((originalDifference / (1000 * 60 * 60)) % 24)
         ),
-        minutes: Math.max(0, Math.floor((originalDifference / 1000 / 60) % 60)),
+        minutes: Math.max(
+          0,
+          Math.floor((originalDifference / (1000 * 60)) % 60)
+        ),
         seconds: Math.max(0, Math.floor((originalDifference / 1000) % 60)),
       },
       extension: {
-        days: Math.floor(extensionDifference / (1000 * 60 * 60 * 24)),
-        hours: Math.floor((extensionDifference / (1000 * 60 * 60)) % 24),
-        minutes: Math.floor((extensionDifference / 1000 / 60) % 60),
-        seconds: Math.floor((extensionDifference / 1000) % 60),
+        days: Math.max(
+          0,
+          Math.floor(extensionDifference / (1000 * 60 * 60 * 24))
+        ),
+        hours: Math.max(
+          0,
+          Math.floor((extensionDifference / (1000 * 60 * 60)) % 24)
+        ),
+        minutes: Math.max(
+          0,
+          Math.floor((extensionDifference / (1000 * 60)) % 60)
+        ),
+        seconds: Math.max(0, Math.floor((extensionDifference / 1000) % 60)),
       },
     };
   });
@@ -54,10 +65,9 @@ function CountdownTimer() {
       const now = new Date();
       const originalDifference = targetDate.getTime() - now.getTime();
       const extensionDifference = nextDay.getTime() - now.getTime();
-      const isNegative = originalDifference < 0;
 
       setTimeLeft({
-        isNegative,
+        isNegative: originalDifference < 0,
         original: {
           days: Math.max(
             0,
@@ -69,15 +79,24 @@ function CountdownTimer() {
           ),
           minutes: Math.max(
             0,
-            Math.floor((originalDifference / 1000 / 60) % 60)
+            Math.floor((originalDifference / (1000 * 60)) % 60)
           ),
           seconds: Math.max(0, Math.floor((originalDifference / 1000) % 60)),
         },
         extension: {
-          days: Math.floor(extensionDifference / (1000 * 60 * 60 * 24)),
-          hours: Math.floor((extensionDifference / (1000 * 60 * 60)) % 24),
-          minutes: Math.floor((extensionDifference / 1000 / 60) % 60),
-          seconds: Math.floor((extensionDifference / 1000) % 60),
+          days: Math.max(
+            0,
+            Math.floor(extensionDifference / (1000 * 60 * 60 * 24))
+          ),
+          hours: Math.max(
+            0,
+            Math.floor((extensionDifference / (1000 * 60 * 60)) % 24)
+          ),
+          minutes: Math.max(
+            0,
+            Math.floor((extensionDifference / (1000 * 60)) % 60)
+          ),
+          seconds: Math.max(0, Math.floor((extensionDifference / 1000) % 60)),
         },
       });
     }, 1000);
@@ -111,10 +130,9 @@ function CountdownTimer() {
           </div>
         </div>
       </div>
-
       {timeLeft.isNegative && (
         <>
-          <div className="flex items-center text-[22.5px] tracking-[-0.055em] text-[#3a3a3a] mt-4">
+          <div className="flex items-center mt-4 text-[22.5px] tracking-[-0.055em] text-[#3a3a3a] line-through opacity-50">
             <div className="flex items-center space-x-2">
               <div className="flex items-center gap-0">
                 <AnimatedCounter value={timeLeft.extension.days} />
@@ -135,12 +153,52 @@ function CountdownTimer() {
             </div>
           </div>
           <p className="mt-4 text-[18px] px-4 tracking-[-0.055em] text-[#3a3a3a] opacity-80">
-            yes, you missed the deadline but we&apos;re extending the apps for
-            another day
+            You missed both deadlines, but we're running another batch in
+            summer.
           </p>
         </>
       )}
     </div>
+  );
+}
+
+/* A new "delayed" button that forces the user to wait 3 seconds.
+   After two quick attempts, the real CTA appears (a link rendered via CTAButton). */
+function DelayedCTAButton({ href, variant = "solid", children }) {
+  const [waiting, setWaiting] = useState(false);
+  const [showRealButton, setShowRealButton] = useState(false);
+  const waitTime = 3;
+
+  const handleClick = () => {
+    if (waiting) return;
+    setWaiting(true);
+    setTimeout(() => {
+      setShowRealButton(true);
+    }, waitTime * 1000);
+  };
+
+  if (showRealButton) {
+    return (
+      <CTAButton href={href} variant={variant}>
+        Grab Your Comeback Application
+      </CTAButton>
+    );
+  }
+
+  return (
+    <button
+      onClick={handleClick}
+      disabled={waiting}
+      className={`px-14 py-[22px] transition-colors duration-200 tracking-[-0.055em] font-semibold text-[1.25rem] ${
+        !waiting
+          ? "bg-zinc-800 text-white hover:bg-zinc-700"
+          : "bg-zinc-400 text-zinc-200 cursor-not-allowed"
+      }`}
+    >
+      {!waiting
+        ? children
+        : `Wait ${waitTime} seconds... (just like you made us wait)`}
+    </button>
   );
 }
 
@@ -158,7 +216,7 @@ export default function Home() {
   // Breakpoint: md (>=768px) is desktop
   const [isDesktop, setIsDesktop] = useState(true);
 
-  // Add state for section visibility
+  // State for section visibility
   const [isExpanded, setIsExpanded] = useState(false);
 
   useEffect(() => {
@@ -232,9 +290,11 @@ export default function Home() {
         if (data.fatal) {
           switch (data.type) {
             case Hls.ErrorTypes.NETWORK_ERROR:
+              console.error("fatal network error encountered, try to recover");
               hls.startLoad();
               break;
             case Hls.ErrorTypes.MEDIA_ERROR:
+              console.error("fatal media error encountered, try to recover");
               hls.recoverMediaError();
               break;
             default:
@@ -334,9 +394,12 @@ export default function Home() {
               {/* CTA Button for desktop (rendered above heading) */}
               {isDesktop && (
                 <div className="mb-12 flex justify-center md:justify-start">
-                  <CTAButton href="https://tally.so/r/3X8ypP" variant="solid">
+                  <DelayedCTAButton
+                    href="https://tally.so/r/waaaR2"
+                    variant="solid"
+                  >
                     join us - apply here
-                  </CTAButton>
+                  </DelayedCTAButton>
                 </div>
               )}
               {/* [ship it] Heading */}
@@ -350,9 +413,12 @@ export default function Home() {
               {/* For mobile, the CTA Button is rendered right below the heading */}
               {!isDesktop && (
                 <div className="mb-12 flex">
-                  <CTAButton href="https://tally.so/r/3X8ypP" variant="solid">
+                  <DelayedCTAButton
+                    href="https://tally.so/r/waaaR2"
+                    variant="solid"
+                  >
                     join us - apply here
-                  </CTAButton>
+                  </DelayedCTAButton>
                 </div>
               )}
               {/* Audio Player UI (only on desktop) */}
@@ -453,9 +519,12 @@ export default function Home() {
                   you&apos;re building.
                 </p>
               </div>
-              <CTAButton href="https://tally.so/r/3X8ypP" variant="solid">
+              <DelayedCTAButton
+                href="https://tally.so/r/waaaR2"
+                variant="solid"
+              >
                 we built this for you - join us
-              </CTAButton>
+              </DelayedCTAButton>
               {/* Collapsible section */}
               <div className="mt-16 mb-12">
                 <button
