@@ -322,7 +322,7 @@ export default function Home() {
               )}
               {/* [ship it] Heading */}
               <h2
-                className={`font-bold mb-6 text-zinc-800 tracking-[-0.055em] ${
+                className={`font-bold -mb-8 text-zinc-800 tracking-[-0.055em] ${
                   isDesktop ? "text-[32px]" : "text-[36px]"
                 }`}
               >
@@ -337,7 +337,7 @@ export default function Home() {
                   </TextScramble> */}
                   <MorphingText
                     // loop={false}
-                    startDelay={2}
+                    startDelay={1.5}
                     texts={["[Ship it]", "[We Shipped it]"]}
                   />
                 </span>
