@@ -322,8 +322,8 @@ export default function Home() {
               )}
               {/* [ship it] Heading */}
               <h2
-                className={`font-bold -mb-8 text-zinc-800 tracking-[-0.055em] ${
-                  isDesktop ? "text-[32px]" : "text-[36px]"
+                className={`font-bold text-zinc-800 tracking-[-0.055em] ${
+                  isDesktop ? "text-[32px] -mb-8" : "text-[36px]"
                 }`}
               >
                 <span className="whitespace-nowrap">
